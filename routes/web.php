@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AttemptController;
+use App\Http\Controllers\ReactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +17,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+//Route::get('/{path?}', [ReactController::class, 'index'])->where('path', '.*');
+
+Route::get('/{path?}', function () {
+    //dd("KST API");
     return view('welcome');
 });
+Route::get('attempts/{attempt}/protocol', [AttemptController::class, 'export_protocol']);
+Route::get('{id}/protocol', [AuthController::class, 'export_protocol']);
+
+Route::get('users/{userId}/tests/{testId}/protocol', [AuthController::class, 'export_full']);
+Route::get('/users/{user}/data', [UserController::class, 'export_data']);

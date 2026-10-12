@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('firstname');
             $table->string('middlename');
             $table->string('login');
-            $table->string('password_plain');
+           // $table->string('password_plain');
            // $table->dropUnique('users_email_unique');
             $table->string('email')->nullable()->change();
         });

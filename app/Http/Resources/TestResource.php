@@ -18,7 +18,7 @@ class TestResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'link' => $this->link,
-            'base_attempts' => $this->base_attempts
+            'countAttempts' => $this->base_attempts
         ];
     }
 }

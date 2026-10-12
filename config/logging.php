@@ -54,6 +54,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'database' => [
+            'driver' => 'database',
+            'table' => 'logs', // Название вашей таблицы логов
+            'connection' => null, // Используйте конфигурацию по умолчанию
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
