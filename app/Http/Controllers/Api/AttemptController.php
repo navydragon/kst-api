@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\Log;
 
 class AttemptController extends Controller
@@ -182,6 +183,7 @@ class AttemptController extends Controller
         }
 
         $pathToSave = storage_path('protocols/protocol_'.$attempt->protocol_number.'.docx');
+        File::ensureDirectoryExists(dirname($pathToSave), 0755, true);
         $t->saveAs($pathToSave);
 
         Log::create([

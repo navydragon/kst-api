@@ -8,6 +8,7 @@ use App\Models\Log;
 use App\Models\Filial;
 use App\Http\Resources\FilialReportResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 
 use App\Exports\LogExport;
@@ -37,7 +38,9 @@ class AdminController extends Controller
     {
         //return Excel::download(new LogExport, 'logs.xlsx');
         $table = Log::all();
-        $filename = "logs.csv";
+        // Файл пишем в storage/, т.к. рабочий каталог php-fpm недоступен на запись.
+        $filename = storage_path('app/logs.csv');
+        File::ensureDirectoryExists(dirname($filename), 0755, true);
         $handle = fopen($filename, 'w+');
         fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
         fputcsv($handle, array('ID','type','Message','Context','Extra','created_at','updated_at'),';');
@@ -77,7 +80,8 @@ class AdminController extends Controller
         $to = $request->input('endDate');
         $fromDate = $from ? Carbon::createFromFormat('Y-m-d', $from)->startOfDay() : null;
         $toDate = $to ? Carbon::createFromFormat('Y-m-d', $to)->endOfDay() : null;
-        $filename = "filial_report.csv";
+        $filename = storage_path('app/filial_report.csv');
+        File::ensureDirectoryExists(dirname($filename), 0755, true);
         $handle = fopen($filename, 'w+');
         fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
         fputcsv($handle, array('Филиал','Кол-во тестирований'),';');
