@@ -1,6 +1,16 @@
 /node_modules
 /public/hot
 /public/storage
+# CRA SPA (отдаётся из репозитория testing-system)
+/public/index.html
+/public/asset-manifest.json
+/public/manifest.json
+/public/robots.txt
+/public/fav.ico
+/public/favicon.ico
+/public/logo192.png
+/public/logo512.png
+/public/static/
 /storage/*.key
 /vendor
 .env
