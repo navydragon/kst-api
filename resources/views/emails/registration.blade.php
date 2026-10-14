@@ -12,6 +12,8 @@
       <li>Логин: {{ $user->login }}</li>
       <li>Пароль: 159753</li>
     </ul>
+    @if($user->change_password)
     <p>При первом входе пароль нужно будет сменить.</p>
+    @endif
 </body>
 </html>

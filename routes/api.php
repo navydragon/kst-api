@@ -7,9 +7,11 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\Api\AttemptController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\FilialController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Crypt;
 
 /*
@@ -24,6 +26,9 @@ use Illuminate\Support\Facades\Crypt;
 */
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/test_login', [AuthController::class, 'test_login']);
+Route::post('/register', [RegisterController::class, 'store']);
+Route::get('/settings/public', [SettingController::class, 'publicSettings']);
+Route::get('/filials/public', [FilialController::class, 'publicIndex']);
 
 Route::post('/store_raw2', [AuthController::class, 'store_raw']);
 Route::post('/store_raw', [AttemptController::class, 'store']);
@@ -50,6 +55,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
     Route::get('/result', [UserController::class, 'result']);
+    Route::get('/settings', [SettingController::class, 'index']);
+    Route::post('/settings', [SettingController::class, 'store']);
+    Route::patch('/settings/{setting}', [SettingController::class, 'update']);
+    Route::delete('/settings/{setting}', [SettingController::class, 'destroy']);
+
     Route::get('/logs', [AdminController::class, 'logs']);
     Route::get('/report', [AdminController::class, 'report']);
 
