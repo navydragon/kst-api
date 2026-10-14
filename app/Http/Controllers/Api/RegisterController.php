@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\RegistrationMail;
 use App\Models\Filial;
 use App\Models\Log;
 use App\Models\Test;
@@ -11,7 +10,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
 {
@@ -23,6 +22,17 @@ class RegisterController extends Controller
             'middlename' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'filial_id' => 'required|integer|exists:filials,id',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Password::min(12)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
+            'password_confirmation' => 'required',
         ], [
             'lastname.required' => 'Укажите фамилию',
             'firstname.required' => 'Укажите имя',
@@ -32,6 +42,14 @@ class RegisterController extends Controller
             'filial_id.required' => 'Выберите филиал',
             'filial_id.exists' => 'Выбранный филиал не найден',
             'filial_id.integer' => 'Выберите филиал',
+            'password.required' => 'Укажите пароль',
+            'password.confirmed' => 'Пароли не совпадают',
+            'password.min' => 'Пароль не соответствует правилам безопасности',
+            'password.letters' => 'Пароль не соответствует правилам безопасности',
+            'password.mixed' => 'Пароль не соответствует правилам безопасности',
+            'password.numbers' => 'Пароль не соответствует правилам безопасности',
+            'password.symbols' => 'Пароль не соответствует правилам безопасности',
+            'password_confirmation.required' => 'Подтвердите пароль',
         ]);
 
         $filial = Filial::find($request->input('filial_id'));
@@ -57,7 +75,7 @@ class RegisterController extends Controller
         $user->middlename = $middlename;
         $user->name = trim($user->lastname.' '.$user->firstname.' '.$middlename);
         $user->login = $login;
-        $user->password = Hash::make('159753');
+        $user->password = Hash::make($request->input('password'));
         $user->filial_id = $filial->id;
         $user->role_id = 2;
         $user->email = $request->input('email');
@@ -81,16 +99,6 @@ class RegisterController extends Controller
             'message' => 'Самостоятельная регистрация '.$user->name.' (id='.$user->id.')',
             'context' => 'IP: '.$request->ip(),
         ]);
-
-        try {
-            Mail::to($user->email)->send(new RegistrationMail($user));
-        } catch (\Throwable $e) {
-            Log::create([
-                'level' => 'error',
-                'message' => 'Письмо регистрации не отправлено, user id='.$user->id,
-                'context' => $e->getMessage(),
-            ]);
-        }
 
         $tokenResult = $user->createToken('authToken')->plainTextToken;
 

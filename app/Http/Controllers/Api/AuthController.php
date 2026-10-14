@@ -27,7 +27,11 @@ class AuthController extends Controller
             'password' => 'required'
           ]);
 
-          $user = User::where('login', $request->login)->first();
+          $identifier = $request->login;
+          $user = User::where(function ($query) use ($identifier) {
+            $query->where('login', $identifier)
+              ->orWhere('email', $identifier);
+          })->first();
 
           if (!$user || !Hash::check($request->password, $user->password)) {
             Log::create([
@@ -36,8 +40,10 @@ class AuthController extends Controller
               'context' => 'IP: ' . $request->ip(),
               'extra' => 'login: '. $request->login
             ]);
-            $user->login_attempts +=1;
-            $user->save();
+            if ($user) {
+              $user->login_attempts +=1;
+              $user->save();
+            }
             return response('Login invalid', 503);
           }
 
