@@ -21,6 +21,7 @@ use App\Models\Test;
 use App\Models\User;
 use App\Models\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 
 
@@ -179,6 +180,7 @@ class UserController extends Controller
         }
 
         $pathToSave = storage_path('protocols/'.$user->name.'.docx');
+        File::ensureDirectoryExists(dirname($pathToSave), 0755, true);
         $t->saveAs($pathToSave);
         return response()->download(storage_path('protocols/'.$user->name.'.docx'));
     }

@@ -8,6 +8,7 @@ use App\Http\Resources\TestResource;
 use App\Http\Requests\TestRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Test;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 
@@ -81,7 +82,23 @@ class TestController extends Controller
 
     public function start_test(Request $request) {
         $token = $request->code;
-        $user_id = Crypt::decryptString($token);
+
+        // code в БД — обычный 6-значный код пользователя; раньше здесь
+        // был только Crypt::decryptString(), из-за чего запрос падал с 500.
+        $user_id = null;
+        if ($token) {
+            try {
+                $user_id = Crypt::decryptString($token);
+            } catch (\Throwable $e) {
+                $user_id = null;
+            }
+        }
+
+        if (!$user_id || !User::whereKey($user_id)->exists()) {
+            $user = User::where('code', $token)->first();
+            abort_unless($user, 404, 'Код не найден');
+            $user_id = $user->id;
+        }
 
         return view('iframe', ['user_id' => $user_id]);
     }
